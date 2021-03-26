@@ -1,8 +1,8 @@
 let W = window.innerWidth;
 let H = window.innerHeight;
 let L;
-let M = 9;
-let N = 12;
+let M = 4;
+let N = 4;
 let R;
 let Ord;
 let GmH = [];
@@ -10,7 +10,9 @@ let cols;
 let rows;
 let subgroup;
 let c;
-let IMG = false;
+let drag = 0;
+let button1;
+let button2;
 
 function setup() {
     if (W >= H) {
@@ -18,45 +20,91 @@ function setup() {
     } else {
         L = W;
     }
-    R = floor(5*L/(M*N));
     c = createCanvas(W, H);
     background(0);
     cols = floor(W/(M+1));
     rows = floor(H/(N+1));
+    R = floor(cols*rows/(1.8*(Math.sqrt(Math.pow(cols, 2)+Math.pow(rows, 2)))));
+    m_slider = createSlider(2, 31, 6, 1);
+    m_slider.position(W/3, H/20);
+    m_slider.style('width', '15vw');
+    n_slider = createSlider(2, 31, 6, 1);
+    n_slider.position(W/2, H/20);
+    n_slider.style('width', '15vw');
+    M = m_slider.value();
+    N = n_slider.value();
+    m_slider.hide();
+    n_slider.hide();
+    button1 = createButton('Set');
+    button1.position(W-W/5, H/20);
+    button1.hide();
     init();
 }
 
-function keyPressed() {
-    if (keyCode === UP_ARROW) {
-        IMG = true;
-    }
-}
-
 function init() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    createCanvas(W, H);
+    background(0);
     subgroup = [];
     GmH = [];
     Ord = 0;
     cols = floor(W/(M+1));
     rows = floor(H/(N+1));
-    R = floor(5*L/(M*N));
+    R = floor(cols*rows/(1.8*(Math.sqrt(Math.pow(cols, 2)+Math.pow(rows, 2)))));
 }
 
-function doubleClicked() {
-    if (mouseX >= W/2 && mouseY <= H/2) {
-        M += 1;
-        init();
+function deviceTurned() {
+    resize();
+}
+
+function set_mn() {
+    M = m_slider.value();
+    N = n_slider.value();
+    button2.hide();
+    m_slider.hide();
+    n_slider.hide();
+    button1.show();
+    init();
+}
+
+function set_() {
+    button1.hide();
+    m_slider.show();
+    n_slider.show();
+    button2 = createButton('Run');
+    button2.position(W-W/5, H/20);
+    button2.mousePressed(set_mn);
+}
+
+function mouseDragged() {
+    if (drag % 2 === 0 && mouseX < 1.5*cols) {
+        button1.show();
+    } else {
+        button1.hide();
     }
-    if (mouseX >= W/2 && mouseY > H/2) {
-        N -= 1;
-        init();
+}
+
+function mouseReleased() {
+    drag++;
+}
+
+
+
+function touchStarted() {
+    init();
+    on_point = false;
+    for (let i = 0; i < M; i++) {
+        for (let j = 0; j < N; j++) {
+            if (dist(mouseX, mouseY, cols*(i+1), H-rows*(j+1)) <= R) {
+                subgroup.push([i, j]);
+                on_point = true;
+                break;
+            }
+        }
     }
-    if (mouseX < W/2 && mouseY <= H/2) {
-        N += 1;
-        init();
-    }
-    if (mouseX < W/2 && mouseY > H/2) {
-        M -= 1;
-        init();
+    if (on_point) {
+        get_sub();
     }
 }
 
@@ -130,6 +178,7 @@ function get_cosets() {
 
 function draw() {
     background(0);
+    button1.mousePressed(set_);
     if (GmH.length > 0) {
         colorMode(HSB, GmH.length);
         for (let i = 0; i < GmH.length; i++) {
@@ -147,12 +196,6 @@ function draw() {
                 ellipse(cols*(i+1), H-rows*(j+1), R);
             }
         }
-    }
-    if (IMG) {
-        noLoop();
-        saveCanvas(c, 'image', 'jpg');
-        IMG = false;
-        loop();
     }
 }
 
