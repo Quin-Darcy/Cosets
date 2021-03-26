@@ -1,7 +1,5 @@
-let W = window.innerWidth-20;
-let H = window.innerHeight-20;
-console.log(W);
-console.log(H);
+let W = window.innerWidth;
+let H = window.innerHeight;
 let L;
 let M = 9;
 let N = 12;
@@ -20,7 +18,7 @@ function setup() {
     } else {
         L = W;
     }
-    R = floor(3*L/(M*N));
+    R = floor(5*L/(M*N));
     c = createCanvas(W, H);
     background(0);
     cols = floor(W/(M+1));
@@ -40,7 +38,7 @@ function init() {
     Ord = 0;
     cols = floor(W/(M+1));
     rows = floor(H/(N+1));
-    R = floor(3*L/(M*N));
+    R = floor(5*L/(M*N));
 }
 
 function doubleClicked() {
@@ -62,7 +60,7 @@ function doubleClicked() {
     }
 }
 
-function mouseClicked() {
+function mousePressed() {
     init();
     on_point = false;
     for (let i = 0; i < M; i++) {
